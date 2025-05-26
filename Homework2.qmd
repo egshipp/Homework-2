@@ -1,0 +1,201 @@
+---
+title: "Programming in Base R"
+format: pdf
+editor: visual
+---
+## Task 1: Basic Vector Practice
+
+### Question 1:
+```{r}
+pre <- c(130, 128, 116, 124, 133, 134, 118, 126, 114, 127, 141, 138, 128, 140, 
+         137, 131, 120, 128, 139, 135)
+
+post <- c(114, 98, 113, 99, 107, 116, 113, 111, 119, 117, 101, 119, 130, 122, 
+          106, 106, 124, 102, 117, 113)
+```
+
+### Question 2:
+```{r}
+sub_name <- paste("Subject", 1:20, sep = "_")
+
+pre_name <- matrix(c(sub_name, pre),
+                   nrow = 20,
+                   ncol = 2)
+
+post_name <- matrix(c(sub_name, post),
+                   nrow = 20,
+                   ncol = 2)
+```
+### Question 3:
+```{r}
+diff_op <- pre - post
+diff_op
+```
+### Question 4:
+```{r}
+mean(diff_op)
+```
+### Question 5:
+```{r}
+(which(diff_op >= 0))
+```
+### Question 6:
+```{r}
+sub_name[(which(diff_op >= 0))]
+```
+### Question 7:
+```{r}
+mean((which(diff_op >= 0)))
+```
+
+## Task 2: Basic Dataframe Practice
+
+### Question 1:
+
+```{r}
+
+df <- data.frame(sub_name = sub_name, 
+                 pre_bp = pre, 
+                 post_bp = post, 
+                 diff_bp = diff_op)
+
+```
+ 
+### Question 2:
+
+```{r}
+df[c(9, 13, 17),]
+```
+
+### Question 3:
+```{r}
+
+df$post_cat <- NA
+
+for (i in 1:nrow(df)){
+ if (df$post_bp[i] < 120) {
+   df$post_cat[i] <- "TRUE"}
+}
+
+```
+### Question 4:
+```{r}
+knitr::kable(df)
+```
+
+## Task 3: List Practice
+
+### Question 1:
+```{r}
+sub_name_new <- paste("Subject", 1:10, sep = "_")
+
+pre_new <- c(138, 135, 147, 117, 152, 134, 114, 121, 131, 130)
+
+post_new <- c(105, 136, 123, 130, 134, 143, 135, 139, 120, 124)
+
+diff_bp_new <- pre_new - post_new
+
+df_new <- data.frame(sub_name = sub_name_new,
+                     pre_bp = pre_new,
+                     post_bp = post_new,
+                     diff_bp = diff_bp_new)
+
+
+df_new$post_cat <- NA
+
+for (i in 1:nrow(df_new)){
+ if (df_new$post_bp[i] < 120) {
+   df_new$post_cat[i] <- "TRUE"}
+}
+
+```
+### Question 2:
+```{r}
+bp_list <- list(treatment = df, placebo = df_new)
+```
+### Question 3:
+```{r}
+bp_list$treatment
+
+bp_list[1]
+
+bp_list[[1]]
+```
+### Question 4:
+```{r}
+bp_list[[2]][2]
+```
+## Task 4: Control Flow Practice
+### Question 1:
+```{r}
+df$status <- character(20) 
+
+df_new$status <- character(10)
+```
+
+### Question 2:
+```{r}
+for (i in 1:nrow(df)){
+  if (df$post_bp[i] <= 120) {
+    df$status[i] <- "optimal"
+  } else if (df$post_bp[i] > 120 & df$post_bp[i] <= 130) {
+    df$status[i] <- "borderline"
+  } else if (df$post_bp[i] > 130)
+    {df$status[i] <- "high"}
+}
+``` 
+### Question 3:
+```{r}
+
+for (i in 1:nrow(df_new)){
+  if (df_new$post_bp[i] <= 120) {
+    df_new$status[i] <- "optimal"
+  } else if (df_new$post_bp[i] > 120 & df_new$post_bp[i] <= 130) {
+    df_new$status[i] <- "borderline"
+  } else if (df_new$post_bp[i] > 130)
+    {df_new$status[i] <- "high"}
+}
+
+```
+## Task 5: Function Writing
+
+### Question 1:
+```{r}
+
+bp_func <- function(bp_list, stat = "mean"){
+  treatment <- bp_list[[1]]
+  placebo <- bp_list[[2]]
+  
+  my_fun <- get(stat) 
+  
+   values <- c(
+    my_fun(treatment$pre_bp, na.rm = TRUE),
+    my_fun(treatment$post_bp, na.rm = TRUE),
+    my_fun(treatment$diff_bp, na.rm = TRUE),
+    my_fun(placebo$pre_bp, na.rm = TRUE),
+    my_fun(placebo$post_bp, na.rm = TRUE),
+    my_fun(placebo$diff_bp, na.rm = TRUE)
+  )
+   
+  names <- c(
+    paste0("treatment_pre_", stat),
+    paste0("treatment_post_", stat),
+    paste0("treatment_diff_", stat),
+    paste0("placebo_pre_", stat),
+    paste0("placebo_post_", stat),
+    paste0("placebo_diff_", stat)
+  )
+  
+  names(values) <- names
+  return(values)
+}
+
+bp_func(bp_list)
+
+```
+
+
+
+
+
+
